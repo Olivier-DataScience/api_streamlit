@@ -2,10 +2,10 @@ import streamlit as st
 import requests
 import json
 
-# 🔹 Titre de l'application
+# Titre de l'application
 st.title("Prédiction de remboursement de crédit 💰")
 
-# 🔹 Création des champs de saisie pour les 48 features
+# Création des champs de saisie pour les 48 features
 CNT_CHILDREN = st.number_input("CNT_CHILDREN", value=0)
 CNT_FAM_MEMBERS = st.number_input("CNT_FAM_MEMBERS", value=3)
 CODE_GENDER_F = st.selectbox("CODE_GENDER_F (Femme)", [0, 1])
@@ -55,7 +55,7 @@ FLAG_EMAIL = st.selectbox("FLAG_EMAIL (A un email)", [0, 1])
 FLAG_EMP_PHONE = st.selectbox("FLAG_EMP_PHONE (A un téléphone professionnel)", [0, 1])
 FLAG_WORK_PHONE = st.selectbox("FLAG_WORK_PHONE (A un téléphone professionnel)", [0, 1])
 
-# 🔹 Création du JSON pour l'API
+# Création du JSON pour l'API
 input_data = {
     "CNT_CHILDREN": CNT_CHILDREN,
     "CNT_FAM_MEMBERS": CNT_FAM_MEMBERS,
@@ -107,15 +107,23 @@ input_data = {
     "FLAG_WORK_PHONE": FLAG_WORK_PHONE
 }
 
-# 🔹 Envoi de la requête POST à l'API FastAPI
+# Envoi de la requête POST à l'API FastAPI
 url = "https://mon-api-fastapi-32b9272786a2.herokuapp.com/predict"
 response = requests.post(url, json=input_data)
 
-# 🔹 Affichage du résultat
+# Affichage du résultat
 if response.status_code == 200:
     result = response.json()
-    st.success(f"Résultat : {result['prediction']}")
-    st.info(f"Probabilité : {round(result['probabilité'], 4)}")
+    
+    prediction = result['prediction']  # 0 ou 1
+    probabilite = round(result['probabilité'], 4)
+
+    if prediction == 1:
+        st.error(f"Le client risque de ne PAS rembourser")
+    else:
+        st.success(f"Le client est susceptible de rembourser")
+    
+    st.info(f"Probabilité associée : {probabilite}")
 else:
     st.error("Erreur lors de la requête à l'API")
  
